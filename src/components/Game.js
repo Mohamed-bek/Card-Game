@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import GameOverScreen from "./GameOverScreen";
 
-// Your element data
 const elementsData = [
   { id: 1, head: "angular", img: "images/angular.png" },
   { id: 2, head: "vue", img: "images/vue.png" },
@@ -53,6 +52,7 @@ const Game = ({ setGameState, level }) => {
   const [flippedElements, setFlippedElements] = useState([]);
   const [matchedElements, setMatchedElements] = useState([]);
   const [chances, setChances] = useState(getChances(level));
+  const [isWin, setisWin] = useState(null);
 
   useEffect(() => {
     if (flippedElements.length === 2) {
@@ -65,7 +65,6 @@ const Game = ({ setGameState, level }) => {
           second.id,
         ]);
 
-        // Play success audio when cards match
         const success = new Audio("/audios/succ.wav");
         success.play();
       } else {
@@ -86,14 +85,31 @@ const Game = ({ setGameState, level }) => {
       setChances((prev) => prev - 1);
       setFlippedElements([]);
     }
+  }, [flippedElements]);
 
-    if (chances === 0) {
-      setGameState("gameOver");
+  useEffect(() => {
+    // If all elements are matched, player wins
+    if (matchedElements.length === elements.length && elements.length > 0) {
+      setisWin(true);
+      const win = new Audio("/audios/succ.wav");
+      win.play();
+    }
 
+    // If chances are 0 and not all elements are matched, player loses
+    if (chances === 0 && matchedElements.length !== elements.length) {
+      setisWin(false);
       const lose = new Audio("/audios/lose.mp3");
       lose.play();
     }
-  }, [flippedElements, chances, setGameState]);
+  }, [matchedElements, chances, elements.length]);
+
+  useEffect(() => {
+    if (isWin !== null) {
+      setTimeout(() => {
+        setGameState("gameOver");
+      }, 500);
+    }
+  }, [isWin, setGameState]);
 
   const handleClick = (elem) => {
     if (
@@ -109,14 +125,6 @@ const Game = ({ setGameState, level }) => {
       );
       setFlippedElements((prev) => [...prev, elem]);
     }
-  };
-
-  const handleRestart = () => {
-    setElements(shuffleArray(getUniqueElements(elementsData)));
-    setFlippedElements([]);
-    setMatchedElements([]);
-    setChances(getChances(level)); // Reset chances based on level
-    setGameState("playing");
   };
 
   return (
@@ -140,7 +148,9 @@ const Game = ({ setGameState, level }) => {
           </div>
         ))}
       </div>
-      {chances === 0 && <GameOverScreen setGameState={setGameState} />}
+      {isWin !== null && (
+        <GameOverScreen setGameState={setGameState} isWin={isWin} />
+      )}
     </div>
   );
 };

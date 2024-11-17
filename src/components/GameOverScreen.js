@@ -1,9 +1,13 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 const GameOverScreen = ({ setGameState, isWin }) => {
   const handleRestart = () => {
     setGameState("playing");
   };
+
+  useEffect(() => {
+    console.log("isWin in GameOverScreen:", isWin);
+  }, []);
 
   return (
     <div className="popup">

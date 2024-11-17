@@ -5,8 +5,8 @@ import GameOverScreen from "./components/GameOverScreen";
 import "./App.css";
 
 function App() {
-  const [gameState, setGameState] = useState("start"); // start, playing, gameOver
-  const [level, setLevel] = useState("normal"); // Easy, Normal, Hard
+  const [gameState, setGameState] = useState("start");
+  const [level, setLevel] = useState("normal");
 
   return (
     <div className="App">
